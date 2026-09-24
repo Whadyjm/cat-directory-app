@@ -66,16 +66,16 @@ Se utilizó `flutter_bloc` combinando **BLoC** y **Cubit** según la necesidad d
 
 ### 1. Scroll Fluido sin Jank (60 / 120 FPS)
 
-| Carga Inicial (25 razas) | Scroll Profundo Acumulado (75 razas) |
-| :---: | :---: |
-| <img src="docs/performance_overlay.png" width="300" alt="Carga Inicial"> | <img src="docs/performance_overlay_infinite_scroll.png" width="300" alt="Scroll 75 razas"> |
+| Modo Oscuro (25 razas) | Modo Oscuro (75 razas) | Modo Claro (75 razas) |
+| :---: | :---: | :---: |
+| <img src="docs/performance_overlay.png" width="220" alt="Dark Mode 25 razas"> | <img src="docs/performance_overlay_infinite_scroll.png" width="220" alt="Dark Mode 75 razas"> | <img src="docs/performance_overlay_light_mode.png" width="220" alt="Light Mode 75 razas"> |
 
 - **Análisis de frames:** 
-  Las métricas reales observadas en el `PerformanceOverlay` confirman un rendimiento sobresaliente tanto en la primera carga como durante el desplazamiento continuo acumulando múltiples páginas:
-  - **GPU / Raster thread:** promedio sostenido de **6.3 ms a 8.2 ms/frame** (ampliamente por debajo del límite de 16.6 ms de 60 FPS y 8.3 ms de 120 FPS).
-  - **UI thread:** promedio de tan solo **2.6 ms a 3.7 ms/frame** (utilizando apenas el 15% al 22% del presupuesto de fotograma).
-  - **Consistencia con volumen:** Al avanzar en la paginación infinita con 75 razas cargadas en memoria, los tiempos del hilo UI mejoran a **2.6 ms/frame**, demostrando la efectividad de la virtualización.
-  - **Jank:** 0 barras rojas (cero cuadros perdidos) gracias a:
+  Las métricas reales observadas en el `PerformanceOverlay` confirman un rendimiento sobresaliente en ambos temas (Claro y Oscuro) y a lo largo de la paginación continua:
+  - **GPU / Raster thread:** promedio sostenido de **6.3 ms a 11.2 ms/frame** (muy por debajo del límite de 16.6 ms de 60 FPS).
+  - **UI thread:** promedio sostenido de **2.6 ms a 9.0 ms/frame** (utilizando una fracción del presupuesto de fotograma).
+  - **Explicación técnica de picos aislados:** Se observa un pico puntual en el UI thread durante la carga inicial en modo claro (~98 ms), atribuible al calentamiento JIT / compilación de shaders en el emulador Android y a la deserialización del bloque paginado; tras ello, el desplazamiento se estabiliza inmediatamente en promedios fluidos de **9.0 ms** en UI y **11.2 ms** en Raster sin jank perceptible.
+  - **Factores de optimización aplicados:**
     - Reciclaje de ítems en ventana mediante `ListView.builder`.
     - Control de concurrencia `droppable()` en la paginación infinita (descarta peticiones de red duplicadas).
     - Temporizador `debounce(350ms)` en la búsqueda para evitar reconstrucciones por cada tecla pulsada.
@@ -99,9 +99,13 @@ flutter build apk --target-platform android-arm64 --analyze-size
 | **`assets/flutter_assets`** | 106 KB | Fuentes e iconos optimizados |
 | **`classes.dex`** | 217 KB | Bytecode Android compilado |
 
-- **Explicación del tamaño:**
-  - **APK comprimido final:** **`7.4 MB`** (`app-release.apk`).
-  - El 95% del peso corresponde al motor y runtime nativo inevitable de Flutter en arquitecturas ARM64.
+- **Detalles del binario y tamaño:**
+  - **Ruta del APK generado:** [`build/app/outputs/flutter-apk/app-release.apk`](file:///build/app/outputs/flutter-apk/app-release.apk) (**7.4 MB**, listo para instalar o adjuntar en **GitHub Releases**).
+  - **Visualización interactiva en Dart DevTools:**
+    ```bash
+    dart devtools --appSizeBase=~/.flutter-devtools/apk-code-size-analysis_01.json
+    ```
+  - El 95% del peso total corresponde al motor y runtime nativo inevitable de Flutter en arquitecturas ARM64 (`lib/arm64-v8a`).
   - El código de la aplicación es sumamente ligero (**90 KB**), lo cual demuestra ausencia de librerías infladas o código muerto.
   - El tree-shaking automático redujo las fuentes en más de un **99.6%** (`CupertinoIcons`: 1.1 KB, `MaterialIcons`: 4.9 KB).
 
