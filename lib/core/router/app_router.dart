@@ -9,6 +9,7 @@ abstract final class AppRouter {
 
   static final GoRouter router = GoRouter(
     initialLocation: home,
+    errorBuilder: (context, state) => const BreedsPage(),
     routes: [
       GoRoute(
         path: home,

@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.nextep.cat_directory_app",
+      "sha256_cert_fingerprints": [
+        "14:6D:E9:7D:0F:52:AB:E3:85:47:EC:E5:54:3B:E7:F7:66:D4:B3:05:CC:58:CE:86:F1:D0:21:03:22:A1:6F:E1"
+      ]
+    }
+  }
+]
