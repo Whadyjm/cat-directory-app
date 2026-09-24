@@ -6,6 +6,7 @@ import '../../../../core/di/app_injector.dart';
 import '../../../../core/localization/app_language.dart';
 import '../../../../core/localization/breed_translator.dart';
 import '../../../../core/localization/language_cubit.dart';
+import '../../../favorites/presentation/cubit/favorites_cubit.dart';
 import '../../domain/entities/breed.dart';
 import '../bloc/breeds_bloc.dart';
 import '../../../cat_fact/presentation/cubit/cat_fact_cubit.dart';
@@ -28,6 +29,12 @@ class BreedDetailPage extends StatelessWidget {
     final breeds = context.read<BreedsBloc>().state.allBreeds;
     final decodedName = Uri.decodeComponent(breedName).trim();
     for (final b in breeds) {
+      if (b.breed.toLowerCase() == decodedName.toLowerCase()) {
+        return b;
+      }
+    }
+    final favBreeds = context.read<FavoritesCubit>().state.favoriteBreeds;
+    for (final b in favBreeds) {
       if (b.breed.toLowerCase() == decodedName.toLowerCase()) {
         return b;
       }
@@ -69,6 +76,54 @@ class BreedDetailPage extends StatelessWidget {
             breed.breed,
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
+          actions: [
+            Builder(
+              builder: (context) {
+                final isFav = context
+                    .watch<FavoritesCubit>()
+                    .state
+                    .isFavorite(rawBreed.breed);
+                return IconButton(
+                  icon: Icon(
+                    isFav
+                        ? Icons.favorite_rounded
+                        : Icons.favorite_border_rounded,
+                    color: isFav ? Colors.redAccent : null,
+                  ),
+                  tooltip: isFav
+                      ? (language.isSpanish
+                          ? 'Quitar de favoritos'
+                          : 'Remove from favorites')
+                      : (language.isSpanish
+                          ? 'Añadir a favoritos'
+                          : 'Add to favorites'),
+                  onPressed: () {
+                    context.read<FavoritesCubit>().toggleFavorite(rawBreed);
+                    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          isFav
+                              ? (language.isSpanish
+                                  ? '${rawBreed.breed} eliminada de favoritos'
+                                  : '${rawBreed.breed} removed from favorites')
+                              : (language.isSpanish
+                                  ? '${rawBreed.breed} añadida a favoritos'
+                                  : '${rawBreed.breed} added to favorites'),
+                        ),
+                        duration: const Duration(seconds: 2),
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+            const SizedBox(width: 8),
+          ],
         ),
         body: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),

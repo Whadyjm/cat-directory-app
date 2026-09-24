@@ -155,7 +155,9 @@ class BreedsBloc extends Bloc<BreedsEvent, BreedsState> {
   List<Breed> _filterBreeds(List<Breed> breeds, String query, String coat) {
     return breeds.where((b) {
       final matchesQuery = query.isEmpty || b.breed.toLowerCase().contains(query);
-      final matchesCoat = coat == 'All' || b.coat.toLowerCase().contains(coat.toLowerCase());
+      final matchesCoat = coat == 'All' ||
+          coat == 'Favorites' ||
+          b.coat.toLowerCase().contains(coat.toLowerCase());
       return matchesQuery && matchesCoat;
     }).toList();
   }

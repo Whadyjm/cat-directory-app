@@ -8,6 +8,7 @@ import '../../../../core/localization/breed_translator.dart';
 import '../../../../core/localization/language_cubit.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/theme_cubit.dart';
+import '../../../favorites/presentation/cubit/favorites_cubit.dart';
 import '../../domain/entities/breed.dart';
 import '../bloc/breeds_bloc.dart';
 import '../bloc/breeds_event.dart';
@@ -201,6 +202,34 @@ class _BreedsPageState extends State<BreedsPage> with WidgetsBindingObserver {
               ],
             ),
           ),
+          Builder(
+            builder: (context) {
+              final favoritesCount = context
+                  .watch<FavoritesCubit>()
+                  .state
+                  .favoriteBreeds
+                  .length;
+              return Semantics(
+                button: true,
+                label: language.isSpanish ? 'Ver favoritos' : 'View favorites',
+                child: IconButton(
+                  icon: Badge.count(
+                    count: favoritesCount,
+                    isLabelVisible: favoritesCount > 0,
+                    backgroundColor: Colors.redAccent,
+                    child: const Icon(
+                      Icons.favorite_rounded,
+                      color: Colors.redAccent,
+                    ),
+                  ),
+                  tooltip:
+                      language.isSpanish ? 'Razas favoritas' : 'Favorite breeds',
+                  onPressed: () => context.push('/favorites'),
+                ),
+              );
+            },
+          ),
+          const SizedBox(width: 4),
           Semantics(
             button: true,
             label: language.isSpanish
@@ -299,8 +328,11 @@ class _BreedsPageState extends State<BreedsPage> with WidgetsBindingObserver {
     AppLanguage language,
   ) {
     final colorScheme = Theme.of(context).colorScheme;
+    final favCount =
+        context.watch<FavoritesCubit>().state.favoriteBreeds.length;
     const coats = [
       'All',
+      'Favorites',
       'Short',
       'Long',
       'Medium',
@@ -317,7 +349,11 @@ class _BreedsPageState extends State<BreedsPage> with WidgetsBindingObserver {
           final isSelected = state.selectedCoat.toLowerCase() == coat.toLowerCase();
           final label = coat == 'All'
               ? (language.isSpanish ? 'Todos' : 'All')
-              : BreedTranslator.translateCoat(coat, language);
+              : coat == 'Favorites'
+                  ? (language.isSpanish
+                      ? '❤️ Favoritos ($favCount)'
+                      : '❤️ Favorites ($favCount)')
+                  : BreedTranslator.translateCoat(coat, language);
 
           return Padding(
             padding: const EdgeInsets.only(right: 8),
@@ -355,6 +391,38 @@ class _BreedsPageState extends State<BreedsPage> with WidgetsBindingObserver {
     BreedsState state,
     AppLanguage language,
   ) {
+    if (state.selectedCoat == 'Favorites') {
+      final favState = context.watch<FavoritesCubit>().state;
+      final query = state.searchQuery.toLowerCase();
+      final favs = favState.favoriteBreeds.where((b) {
+        return query.isEmpty || b.breed.toLowerCase().contains(query);
+      }).toList();
+
+      if (favs.isEmpty) {
+        return _buildFavoritesEmptyState(
+          context,
+          language,
+          Theme.of(context).colorScheme,
+        );
+      }
+
+      return ListView.builder(
+        controller: _scrollController,
+        padding: const EdgeInsets.only(top: 8, bottom: 24),
+        itemCount: favs.length,
+        itemBuilder: (context, index) {
+          final breed = BreedTranslator.translateBreed(favs[index], language);
+          return BreedListItem(
+            breed: breed,
+            onTap: () => context.push(
+              '/breed/${Uri.encodeComponent(favs[index].breed)}',
+              extra: favs[index],
+            ),
+          );
+        },
+      );
+    }
+
     if (state.isLoadingInitial && !state.hasData) {
       return const BreedSkeletonList();
     }
@@ -368,6 +436,53 @@ class _BreedsPageState extends State<BreedsPage> with WidgetsBindingObserver {
     }
 
     return _buildList(context, state, language);
+  }
+
+  Widget _buildFavoritesEmptyState(
+    BuildContext context,
+    AppLanguage language,
+    ColorScheme colorScheme,
+  ) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: Colors.redAccent.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.favorite_border_rounded,
+                size: 40,
+                color: Colors.redAccent,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              language.isSpanish ? 'Sin razas favoritas' : 'No favorite breeds',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              language.isSpanish
+                  ? 'Toca el corazón en cualquier raza para guardarla aquí.'
+                  : 'Tap the heart on any breed to save it here.',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onSurface.withValues(alpha: 0.6),
+                  ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildList(

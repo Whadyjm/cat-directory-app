@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/localization/breed_translator.dart';
+import '../../../favorites/presentation/cubit/favorites_cubit.dart';
 import '../../domain/entities/breed.dart';
 
 class BreedListItem extends StatelessWidget {
@@ -17,6 +19,7 @@ class BreedListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final flag = BreedTranslator.getCountryFlag(breed.country);
+    final isFav = context.watch<FavoritesCubit>().state.isFavorite(breed.breed);
 
     return Semantics(
       label: 'Raza: ${breed.breed}, País: ${breed.country}, Pelaje: ${breed.coat}',
@@ -140,6 +143,21 @@ class BreedListItem extends StatelessWidget {
                           ),
                         ],
                       ),
+                    ),
+                    IconButton(
+                      icon: Icon(
+                        isFav
+                            ? Icons.favorite_rounded
+                            : Icons.favorite_border_rounded,
+                        color: isFav
+                            ? Colors.redAccent
+                            : colorScheme.onSurface.withValues(alpha: 0.35),
+                        size: 22,
+                      ),
+                      tooltip: isFav ? 'Quitar favorito' : 'Favorito',
+                      onPressed: () {
+                        context.read<FavoritesCubit>().toggleFavorite(breed);
+                      },
                     ),
                     Icon(
                       Icons.chevron_right_rounded,
