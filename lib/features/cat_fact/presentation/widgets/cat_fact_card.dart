@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shimmer/shimmer.dart';
 
+import '../../../../core/localization/app_language.dart';
+import '../../../../core/localization/language_cubit.dart';
+import '../../domain/entities/cat_fact.dart';
 import '../cubit/cat_fact_cubit.dart';
 import '../cubit/cat_fact_state.dart';
 
@@ -11,6 +14,7 @@ class CatFactCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final language = context.watch<LanguageCubit>().state;
 
     return Container(
       decoration: BoxDecoration(
@@ -48,7 +52,9 @@ class CatFactCard extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  'Dato Curioso Aleatorio',
+                  language.isSpanish
+                      ? 'Dato Curioso Aleatorio'
+                      : 'Random Curious Fact',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: colorScheme.onSurface,
@@ -69,7 +75,9 @@ class CatFactCard extends StatelessWidget {
                             Icons.refresh_rounded,
                             color: colorScheme.primary,
                           ),
-                    tooltip: 'Cargar otro dato',
+                    tooltip: language.isSpanish
+                        ? 'Cargar otro dato'
+                        : 'Load another fact',
                     onPressed: isLoading
                         ? null
                         : () => context.read<CatFactCubit>().fetchRandomFact(),
@@ -82,9 +90,9 @@ class CatFactCard extends StatelessWidget {
           BlocBuilder<CatFactCubit, CatFactState>(
             builder: (context, state) {
               return switch (state) {
-                CatFactInitial() || CatFactLoading() => _buildLoadingState(context),
-                CatFactLoaded(:final fact) => _buildLoadedState(context, fact.fact),
-                CatFactError(:final message) => _buildErrorState(context, message),
+                CatFactInitial() || CatFactLoading() => _buildLoadingState(context, language),
+                CatFactLoaded(:final fact) => _buildLoadedState(context, fact, language),
+                CatFactError(:final message) => _buildErrorState(context, message, language),
               };
             },
           ),
@@ -93,13 +101,15 @@ class CatFactCard extends StatelessWidget {
     );
   }
 
-  Widget _buildLoadingState(BuildContext context) {
+  Widget _buildLoadingState(BuildContext context, AppLanguage language) {
     final colorScheme = Theme.of(context).colorScheme;
     final baseColor = colorScheme.surfaceContainerHighest;
     final highlightColor = colorScheme.surface;
 
     return Semantics(
-      label: 'Cargando dato curioso...',
+      label: language.isSpanish
+          ? 'Cargando dato curioso...'
+          : 'Loading curious fact...',
       child: Shimmer.fromColors(
         baseColor: baseColor,
         highlightColor: highlightColor,
@@ -138,11 +148,16 @@ class CatFactCard extends StatelessWidget {
     );
   }
 
-  Widget _buildLoadedState(BuildContext context, String fact) {
+  Widget _buildLoadedState(
+    BuildContext context,
+    CatFact fact,
+    AppLanguage language,
+  ) {
     final colorScheme = Theme.of(context).colorScheme;
+    final displayText = fact.localized(language.isSpanish);
 
     return Semantics(
-      label: 'Dato curioso: $fact',
+      label: '${language.isSpanish ? "Dato curioso:" : "Curious fact:"} $displayText',
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -154,7 +169,7 @@ class CatFactCard extends StatelessWidget {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              fact,
+              displayText,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: colorScheme.onSurface.withValues(alpha: 0.85),
                     height: 1.45,
@@ -167,11 +182,15 @@ class CatFactCard extends StatelessWidget {
     );
   }
 
-  Widget _buildErrorState(BuildContext context, String message) {
+  Widget _buildErrorState(
+    BuildContext context,
+    String message,
+    AppLanguage language,
+  ) {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Semantics(
-      label: 'Error al cargar dato curioso: $message',
+      label: '${language.isSpanish ? "Error al cargar dato curioso:" : "Error loading fact:"} $message',
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
@@ -196,7 +215,7 @@ class CatFactCard extends StatelessWidget {
             ),
             TextButton(
               onPressed: () => context.read<CatFactCubit>().fetchRandomFact(),
-              child: const Text('Reintentar'),
+              child: Text(language.isSpanish ? 'Reintentar' : 'Retry'),
             ),
           ],
         ),

@@ -3,6 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/di/app_injector.dart';
+import '../../../../core/localization/app_language.dart';
+import '../../../../core/localization/breed_translator.dart';
+import '../../../../core/localization/language_cubit.dart';
 import '../../domain/entities/breed.dart';
 import '../bloc/breeds_bloc.dart';
 import '../../../cat_fact/presentation/cubit/cat_fact_cubit.dart';
@@ -40,8 +43,10 @@ class BreedDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final breed = _resolveBreed(context);
+    final rawBreed = _resolveBreed(context);
     final colorScheme = Theme.of(context).colorScheme;
+    final language = context.watch<LanguageCubit>().state;
+    final breed = BreedTranslator.translateBreed(rawBreed, language);
 
     return BlocProvider(
       create: (_) => CatFactCubit(
@@ -51,7 +56,7 @@ class BreedDetailPage extends StatelessWidget {
         appBar: AppBar(
           leading: IconButton(
             icon: const Icon(Icons.arrow_back_rounded),
-            tooltip: 'Volver a la lista',
+            tooltip: language.isSpanish ? 'Volver a la lista' : 'Back to list',
             onPressed: () {
               if (context.canPop()) {
                 context.pop();
@@ -70,9 +75,9 @@ class BreedDetailPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _buildHeaderCard(context, breed, colorScheme),
+              _buildHeaderCard(context, breed, colorScheme, language),
               const SizedBox(height: 20),
-              _buildAttributesSection(context, breed, colorScheme),
+              _buildAttributesSection(context, breed, colorScheme, language),
               const SizedBox(height: 24),
               const CatFactCard(),
               const SizedBox(height: 32),
@@ -87,7 +92,12 @@ class BreedDetailPage extends StatelessWidget {
     BuildContext context,
     Breed breed,
     ColorScheme colorScheme,
+    AppLanguage language,
   ) {
+    final countryText = breed.country.isNotEmpty
+        ? breed.country
+        : (language.isSpanish ? 'Desconocido' : 'Unknown');
+
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -161,7 +171,7 @@ class BreedDetailPage extends StatelessWidget {
                 ),
                 const SizedBox(width: 6),
                 Text(
-                  breed.country.isNotEmpty ? breed.country : 'Desconocido',
+                  countryText,
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
@@ -180,6 +190,7 @@ class BreedDetailPage extends StatelessWidget {
     BuildContext context,
     Breed breed,
     ColorScheme colorScheme,
+    AppLanguage language,
   ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -187,7 +198,7 @@ class BreedDetailPage extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.only(left: 4, bottom: 12),
           child: Text(
-            'Características',
+            language.isSpanish ? 'Características' : 'Characteristics',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: colorScheme.onSurface,
@@ -199,20 +210,22 @@ class BreedDetailPage extends StatelessWidget {
             Expanded(
               child: _buildAttributeTile(
                 context,
-                title: 'Origen',
+                title: language.isSpanish ? 'Origen' : 'Origin',
                 value: breed.origin,
                 icon: Icons.public_rounded,
                 colorScheme: colorScheme,
+                language: language,
               ),
             ),
             const SizedBox(width: 12),
             Expanded(
               child: _buildAttributeTile(
                 context,
-                title: 'País',
+                title: language.isSpanish ? 'País' : 'Country',
                 value: breed.country,
                 icon: Icons.flag_outlined,
                 colorScheme: colorScheme,
+                language: language,
               ),
             ),
           ],
@@ -223,20 +236,22 @@ class BreedDetailPage extends StatelessWidget {
             Expanded(
               child: _buildAttributeTile(
                 context,
-                title: 'Pelaje',
+                title: language.isSpanish ? 'Pelaje' : 'Coat',
                 value: breed.coat,
                 icon: Icons.texture_rounded,
                 colorScheme: colorScheme,
+                language: language,
               ),
             ),
             const SizedBox(width: 12),
             Expanded(
               child: _buildAttributeTile(
                 context,
-                title: 'Patrón',
+                title: language.isSpanish ? 'Patrón' : 'Pattern',
                 value: breed.pattern,
                 icon: Icons.grid_view_rounded,
                 colorScheme: colorScheme,
+                language: language,
               ),
             ),
           ],
@@ -251,8 +266,10 @@ class BreedDetailPage extends StatelessWidget {
     required String value,
     required IconData icon,
     required ColorScheme colorScheme,
+    required AppLanguage language,
   }) {
-    final displayValue = value.trim().isNotEmpty ? value.trim() : 'No especificado';
+    final fallback = language.isSpanish ? 'No especificado' : 'Not specified';
+    final displayValue = value.trim().isNotEmpty ? value.trim() : fallback;
 
     return Semantics(
       label: '$title: $displayValue',

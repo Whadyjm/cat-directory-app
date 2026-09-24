@@ -3,6 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/di/app_injector.dart';
+import '../../../../core/localization/app_language.dart';
+import '../../../../core/localization/breed_translator.dart';
+import '../../../../core/localization/language_cubit.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/theme_cubit.dart';
 import '../../domain/entities/breed.dart';
@@ -96,6 +99,8 @@ class _BreedsPageState extends State<BreedsPage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    final language = context.watch<LanguageCubit>().state;
+
     return BlocConsumer<BreedsBloc, BreedsState>(
       listenWhen: (prev, curr) =>
           curr.hasPaginationError && prev.failure != curr.failure,
@@ -108,7 +113,7 @@ class _BreedsPageState extends State<BreedsPage> with WidgetsBindingObserver {
               borderRadius: BorderRadius.circular(10),
             ),
             action: SnackBarAction(
-              label: 'Reintentar',
+              label: language.isSpanish ? 'Reintentar' : 'Retry',
               onPressed: () =>
                   context.read<BreedsBloc>().add(const LoadMoreBreeds()),
             ),
@@ -125,10 +130,12 @@ class _BreedsPageState extends State<BreedsPage> with WidgetsBindingObserver {
               opacity: _showBackToTop ? 1.0 : 0.0,
               child: Semantics(
                 button: true,
-                label: 'Volver al inicio de la lista',
+                label: language.isSpanish
+                    ? 'Volver al inicio de la lista'
+                    : 'Back to top of the list',
                 child: FloatingActionButton.small(
                   onPressed: _showBackToTop ? _scrollToTop : null,
-                  tooltip: 'Volver al inicio',
+                  tooltip: language.isSpanish ? 'Volver al inicio' : 'Back to top',
                   elevation: 4,
                   backgroundColor: Theme.of(context).colorScheme.primary,
                   foregroundColor: Theme.of(context).colorScheme.onPrimary,
@@ -141,9 +148,9 @@ class _BreedsPageState extends State<BreedsPage> with WidgetsBindingObserver {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildHeader(context, state),
-                _buildSearchBar(context, state),
-                Expanded(child: _buildBody(context, state)),
+                _buildHeader(context, state, language),
+                _buildSearchBar(context, state, language),
+                Expanded(child: _buildBody(context, state, language)),
               ],
             ),
           ),
@@ -152,8 +159,23 @@ class _BreedsPageState extends State<BreedsPage> with WidgetsBindingObserver {
     );
   }
 
-  Widget _buildHeader(BuildContext context, BreedsState state) {
+  Widget _buildHeader(
+    BuildContext context,
+    BreedsState state,
+    AppLanguage language,
+  ) {
     final colorScheme = Theme.of(context).colorScheme;
+
+    final subtitle = state.isFromCache
+        ? (language.isSpanish ? 'Mostrando datos en caché' : 'Showing cached data')
+        : state.hasData
+            ? (language.isSpanish
+                ? '${state.allBreeds.length} razas encontradas'
+                : '${state.allBreeds.length} breeds found')
+            : (language.isSpanish
+                ? 'Explorando razas de gatos'
+                : 'Exploring cat breeds');
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 16, 12, 0),
       child: Row(
@@ -170,11 +192,7 @@ class _BreedsPageState extends State<BreedsPage> with WidgetsBindingObserver {
                       ),
                 ),
                 Text(
-                  state.isFromCache
-                      ? 'Mostrando datos en caché'
-                      : state.hasData
-                          ? '${state.allBreeds.length} razas encontradas'
-                          : 'Explorando razas de gatos',
+                  subtitle,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: colorScheme.onSurface.withValues(alpha: 0.55),
                       ),
@@ -182,6 +200,38 @@ class _BreedsPageState extends State<BreedsPage> with WidgetsBindingObserver {
               ],
             ),
           ),
+          Semantics(
+            button: true,
+            label: language.isSpanish
+                ? 'Cambiar idioma a Inglés'
+                : 'Switch language to Spanish',
+            child: TextButton.icon(
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                minimumSize: Size.zero,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                backgroundColor: colorScheme.primary.withValues(alpha: 0.1),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+              icon: Icon(
+                Icons.translate_rounded,
+                size: 16,
+                color: colorScheme.primary,
+              ),
+              label: Text(
+                language.code,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12,
+                  color: colorScheme.primary,
+                ),
+              ),
+              onPressed: () => context.read<LanguageCubit>().toggleLanguage(),
+            ),
+          ),
+          const SizedBox(width: 4),
           BlocBuilder<ThemeCubit, ThemeMode>(
             builder: (context, themeMode) {
               final icon = switch (themeMode) {
@@ -190,9 +240,9 @@ class _BreedsPageState extends State<BreedsPage> with WidgetsBindingObserver {
                 ThemeMode.system => Icons.brightness_auto_rounded,
               };
               final tooltip = switch (themeMode) {
-                ThemeMode.light => 'Modo Claro (tocar para cambiar)',
-                ThemeMode.dark => 'Modo Oscuro (tocar para cambiar)',
-                ThemeMode.system => 'Modo Sistema (tocar para cambiar)',
+                ThemeMode.light => language.isSpanish ? 'Modo Claro' : 'Light Mode',
+                ThemeMode.dark => language.isSpanish ? 'Modo Oscuro' : 'Dark Mode',
+                ThemeMode.system => language.isSpanish ? 'Modo Sistema' : 'System Mode',
               };
               return Semantics(
                 button: true,
@@ -210,18 +260,22 @@ class _BreedsPageState extends State<BreedsPage> with WidgetsBindingObserver {
     );
   }
 
-  Widget _buildSearchBar(BuildContext context, BreedsState state) {
+  Widget _buildSearchBar(
+    BuildContext context,
+    BreedsState state,
+    AppLanguage language,
+  ) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
       child: Semantics(
-        label: 'Buscador de razas de gatos',
+        label: language.isSpanish ? 'Buscador de razas de gatos' : 'Cat breeds search',
         textField: true,
         child: TextField(
           controller: _searchController,
           onChanged: (q) =>
               context.read<BreedsBloc>().add(SearchBreeds(q)),
           decoration: InputDecoration(
-            hintText: 'Buscar raza...',
+            hintText: language.isSpanish ? 'Buscar raza...' : 'Search breed...',
             prefixIcon: const Icon(Icons.search_rounded),
             suffixIcon: state.searchQuery.isNotEmpty
                 ? IconButton(
@@ -238,23 +292,31 @@ class _BreedsPageState extends State<BreedsPage> with WidgetsBindingObserver {
     );
   }
 
-  Widget _buildBody(BuildContext context, BreedsState state) {
+  Widget _buildBody(
+    BuildContext context,
+    BreedsState state,
+    AppLanguage language,
+  ) {
     if (state.isLoadingInitial && !state.hasData) {
       return const BreedSkeletonList();
     }
 
     if (state.hasError) {
-      return _buildErrorState(context, state);
+      return _buildErrorState(context, state, language);
     }
 
     if (state.hasData && state.filteredBreeds.isEmpty) {
-      return _buildEmptySearch(context);
+      return _buildEmptySearch(context, language);
     }
 
-    return _buildList(context, state);
+    return _buildList(context, state, language);
   }
 
-  Widget _buildList(BuildContext context, BreedsState state) {
+  Widget _buildList(
+    BuildContext context,
+    BreedsState state,
+    AppLanguage language,
+  ) {
     final breeds = state.filteredBreeds;
     return RefreshIndicator(
       onRefresh: _onRefresh,
@@ -266,15 +328,16 @@ class _BreedsPageState extends State<BreedsPage> with WidgetsBindingObserver {
         itemBuilder: (context, index) {
           if (index >= breeds.length) {
             return Semantics(
-              label: 'Cargando más razas',
+              label: language.isSpanish ? 'Cargando más razas' : 'Loading more breeds',
               child: const Padding(
                 padding: EdgeInsets.symmetric(vertical: 20),
                 child: Center(child: CircularProgressIndicator()),
               ),
             );
           }
+          final translated = BreedTranslator.translateBreed(breeds[index], language);
           return BreedListItem(
-            breed: breeds[index],
+            breed: translated,
             onTap: () => _navigateToDetail(breeds[index]),
           );
         },
@@ -282,10 +345,14 @@ class _BreedsPageState extends State<BreedsPage> with WidgetsBindingObserver {
     );
   }
 
-  Widget _buildErrorState(BuildContext context, BreedsState state) {
+  Widget _buildErrorState(
+    BuildContext context,
+    BreedsState state,
+    AppLanguage language,
+  ) {
     final colorScheme = Theme.of(context).colorScheme;
     return Semantics(
-      label: 'Error al cargar razas: ${state.failure?.message}',
+      label: '${language.isSpanish ? "Error al cargar razas:" : "Error loading breeds:"} ${state.failure?.message}',
       child: Center(
         child: Padding(
           padding: const EdgeInsets.all(32),
@@ -299,7 +366,8 @@ class _BreedsPageState extends State<BreedsPage> with WidgetsBindingObserver {
               ),
               const SizedBox(height: 20),
               Text(
-                state.failure?.message ?? 'Error desconocido',
+                state.failure?.message ??
+                    (language.isSpanish ? 'Error desconocido' : 'Unknown error'),
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       color: colorScheme.onSurface.withValues(alpha: 0.6),
@@ -310,7 +378,7 @@ class _BreedsPageState extends State<BreedsPage> with WidgetsBindingObserver {
                 onPressed: () =>
                     context.read<BreedsBloc>().add(const LoadBreeds()),
                 icon: const Icon(Icons.refresh_rounded),
-                label: const Text('Reintentar'),
+                label: Text(language.isSpanish ? 'Reintentar' : 'Retry'),
               ),
             ],
           ),
@@ -319,7 +387,7 @@ class _BreedsPageState extends State<BreedsPage> with WidgetsBindingObserver {
     );
   }
 
-  Widget _buildEmptySearch(BuildContext context) {
+  Widget _buildEmptySearch(BuildContext context, AppLanguage language) {
     final colorScheme = Theme.of(context).colorScheme;
     return Center(
       child: Column(
@@ -332,7 +400,9 @@ class _BreedsPageState extends State<BreedsPage> with WidgetsBindingObserver {
           ),
           const SizedBox(height: 16),
           Text(
-            'Sin resultados para tu búsqueda',
+            language.isSpanish
+                ? 'Sin resultados para tu búsqueda'
+                : 'No results found for your search',
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   color: colorScheme.onSurface.withValues(alpha: 0.55),
                 ),
