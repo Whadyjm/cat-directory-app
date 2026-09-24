@@ -1,7 +1,7 @@
 # 🐱 Cat Directory App
 
 > **Prueba Técnica — Nextep Innovation** | Mobile Developer  
-> **Stack:** Flutter (Material 3) • Clean Architecture • BLoC / Cubit • Hive • GoRouter  
+> **Stack:** Flutter 3.32.0
 > **Calidad:** 38/38 Pruebas Unitarias Aprobadas (100%) • 0 incidencias en `flutter analyze`
 
 ---
