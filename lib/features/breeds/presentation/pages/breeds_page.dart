@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/app_router.dart';
+import '../../../../core/theme/theme_cubit.dart';
 import '../../domain/entities/breed.dart';
 import '../bloc/breeds_bloc.dart';
 import '../bloc/breeds_event.dart';
@@ -99,33 +100,56 @@ class _BreedsPageState extends State<BreedsPage> {
   Widget _buildHeader(BuildContext context, BreedsState state) {
     final colorScheme = Theme.of(context).colorScheme;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+      padding: const EdgeInsets.fromLTRB(20, 16, 12, 0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Cat Directory',
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: colorScheme.primary,
-                    ),
-              ),
-              Text(
-                state.isFromCache
-                    ? 'Mostrando datos en caché'
-                    : state.hasData
-                        ? '${state.allBreeds.length} razas encontradas'
-                        : 'Explorando razas de gatos',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onSurface.withValues(alpha: 0.55),
-                    ),
-              ),
-            ],
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Cat Directory',
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: colorScheme.primary,
+                      ),
+                ),
+                Text(
+                  state.isFromCache
+                      ? 'Mostrando datos en caché'
+                      : state.hasData
+                          ? '${state.allBreeds.length} razas encontradas'
+                          : 'Explorando razas de gatos',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onSurface.withValues(alpha: 0.55),
+                      ),
+                ),
+              ],
+            ),
           ),
-          Icon(Icons.pets_rounded, color: colorScheme.primary, size: 28),
+          BlocBuilder<ThemeCubit, ThemeMode>(
+            builder: (context, themeMode) {
+              final icon = switch (themeMode) {
+                ThemeMode.light => Icons.light_mode_rounded,
+                ThemeMode.dark => Icons.dark_mode_rounded,
+                ThemeMode.system => Icons.brightness_auto_rounded,
+              };
+              final tooltip = switch (themeMode) {
+                ThemeMode.light => 'Modo Claro (tocar para cambiar)',
+                ThemeMode.dark => 'Modo Oscuro (tocar para cambiar)',
+                ThemeMode.system => 'Modo Sistema (tocar para cambiar)',
+              };
+              return Semantics(
+                button: true,
+                label: tooltip,
+                child: IconButton(
+                  icon: Icon(icon, color: colorScheme.primary),
+                  tooltip: tooltip,
+                  onPressed: () => context.read<ThemeCubit>().toggleTheme(),
+                ),
+              );
+            },
+          ),
         ],
       ),
     );

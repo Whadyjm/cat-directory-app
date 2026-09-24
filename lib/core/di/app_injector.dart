@@ -1,6 +1,7 @@
 import 'package:hive_ce_flutter/hive_flutter.dart';
 
 import '../network/dio_client.dart';
+import '../theme/theme_cubit.dart';
 import '../../features/breeds/data/datasources/breed_local_datasource.dart';
 import '../../features/breeds/data/datasources/breed_remote_datasource.dart';
 import '../../features/breeds/data/repositories/breeds_repository_impl.dart';
@@ -14,10 +15,14 @@ class AppInjector {
 
   static late final GetBreedsUsecase breedsUsecase;
   static late final GetRandomFactUsecase getRandomFactUsecase;
+  static late final ThemeCubit themeCubit;
 
   static Future<void> init() async {
     await Hive.initFlutter();
     final breedsBox = await Hive.openBox<dynamic>('breeds_cache');
+    final settingsBox = await Hive.openBox<dynamic>('settings_cache');
+
+    themeCubit = ThemeCubit(box: settingsBox);
 
     final dioClient = DioClient();
     final remote = BreedRemoteDatasourceImpl(dio: dioClient.dio);
