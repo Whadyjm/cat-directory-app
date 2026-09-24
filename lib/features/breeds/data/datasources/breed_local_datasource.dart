@@ -8,6 +8,7 @@ import '../models/breeds_response_model.dart';
 abstract class BreedLocalDatasource {
   Future<BreedsResponseModel?> getCachedFirstPage();
   Future<void> cacheFirstPage(BreedsResponseModel response);
+  Future<void> appendBreeds(BreedsResponseModel response);
   bool isCacheStale();
 }
 
@@ -41,6 +42,27 @@ class BreedLocalDatasourceImpl implements BreedLocalDatasource {
         _timestampKey,
         DateTime.now().millisecondsSinceEpoch,
       );
+    } catch (_) {
+      throw const CacheException();
+    }
+  }
+
+  @override
+  Future<void> appendBreeds(BreedsResponseModel response) async {
+    try {
+      final current = await getCachedFirstPage();
+      if (current == null) {
+        await cacheFirstPage(response);
+        return;
+      }
+      final mergedData = [...current.data, ...response.data];
+      final updated = current.copyWith(
+        currentPage: response.currentPage,
+        data: mergedData,
+        lastPage: response.lastPage,
+        total: response.total,
+      );
+      await box.put(_breedsKey, jsonEncode(updated.toJson()));
     } catch (_) {
       throw const CacheException();
     }

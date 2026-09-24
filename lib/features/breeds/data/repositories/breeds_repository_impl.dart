@@ -21,6 +21,8 @@ class BreedsRepositoryImpl implements BreedsRepository {
       final response = await remote.getBreeds(page: page);
       if (page == 1) {
         await local.cacheFirstPage(response);
+      } else {
+        await local.appendBreeds(response);
       }
       return BreedsPageResult(
         breeds: response.data.map((m) => m.toEntity()).toList(),

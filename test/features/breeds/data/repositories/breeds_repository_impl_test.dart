@@ -60,7 +60,7 @@ void main() {
     verify(() => mockLocal.cacheFirstPage(tResponse)).called(1);
   });
 
-  test('getBreeds page 2 does not cache locally and returns result', () async {
+  test('getBreeds page 2 appends breeds to local cache and returns result', () async {
     const tResponsePage2 = BreedsResponseModel(
       currentPage: 2,
       data: [tBreedModel],
@@ -69,12 +69,13 @@ void main() {
     );
 
     when(() => mockRemote.getBreeds(page: 2)).thenAnswer((_) async => tResponsePage2);
+    when(() => mockLocal.appendBreeds(any())).thenAnswer((_) async {});
 
     final result = await repository.getBreeds(page: 2);
 
     expect(result.currentPage, equals(2));
     verify(() => mockRemote.getBreeds(page: 2)).called(1);
-    verifyNever(() => mockLocal.cacheFirstPage(any()));
+    verify(() => mockLocal.appendBreeds(tResponsePage2)).called(1);
   });
 
   test('getBreeds throws NetworkFailure when remote throws NetworkException', () async {
