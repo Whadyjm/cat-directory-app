@@ -10,4 +10,6 @@ class GetBreedsUsecase {
       repository.getBreeds(page: page);
 
   Future<BreedsPageResult?> getCached() => repository.getCachedFirstPage();
+
+  bool isCacheStale() => repository.isCacheStale();
 }

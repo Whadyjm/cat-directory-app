@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/di/app_injector.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/theme_cubit.dart';
 import '../../domain/entities/breed.dart';
@@ -18,21 +19,39 @@ class BreedsPage extends StatefulWidget {
   State<BreedsPage> createState() => _BreedsPageState();
 }
 
-class _BreedsPageState extends State<BreedsPage> {
+class _BreedsPageState extends State<BreedsPage> with WidgetsBindingObserver {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
+  DateTime? _backgroundedAt;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _scrollController.addListener(_onScroll);
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _scrollController.dispose();
     _searchController.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      _backgroundedAt = DateTime.now();
+    } else if (state == AppLifecycleState.resumed) {
+      final wasInBackgroundLong = _backgroundedAt != null &&
+          DateTime.now().difference(_backgroundedAt!) >
+              const Duration(minutes: 5);
+      if (wasInBackgroundLong || AppInjector.breedsUsecase.isCacheStale()) {
+        context.read<BreedsBloc>().add(const RefreshBreeds());
+      }
+      _backgroundedAt = null;
+    }
   }
 
   void _onScroll() {

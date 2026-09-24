@@ -52,4 +52,7 @@ class BreedsRepositoryImpl implements BreedsRepository {
       return null;
     }
   }
+
+  @override
+  bool isCacheStale() => local.isCacheStale();
 }
