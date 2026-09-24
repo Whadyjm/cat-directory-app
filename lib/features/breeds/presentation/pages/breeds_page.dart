@@ -23,6 +23,7 @@ class _BreedsPageState extends State<BreedsPage> with WidgetsBindingObserver {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
   DateTime? _backgroundedAt;
+  bool _showBackToTop = false;
 
   @override
   void initState() {
@@ -61,6 +62,21 @@ class _BreedsPageState extends State<BreedsPage> with WidgetsBindingObserver {
     if (current >= max * 0.92) {
       context.read<BreedsBloc>().add(const LoadMoreBreeds());
     }
+    final shouldShow = current > 350;
+    if (shouldShow != _showBackToTop) {
+      setState(() {
+        _showBackToTop = shouldShow;
+      });
+    }
+  }
+
+  void _scrollToTop() {
+    if (!_scrollController.hasClients) return;
+    _scrollController.animateTo(
+      0,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeOutCubic,
+    );
   }
 
   Future<void> _onRefresh() async {
@@ -101,6 +117,26 @@ class _BreedsPageState extends State<BreedsPage> with WidgetsBindingObserver {
       },
       builder: (context, state) {
         return Scaffold(
+          floatingActionButton: AnimatedSlide(
+            duration: const Duration(milliseconds: 250),
+            offset: _showBackToTop ? Offset.zero : const Offset(0, 2),
+            child: AnimatedOpacity(
+              duration: const Duration(milliseconds: 250),
+              opacity: _showBackToTop ? 1.0 : 0.0,
+              child: Semantics(
+                button: true,
+                label: 'Volver al inicio de la lista',
+                child: FloatingActionButton.small(
+                  onPressed: _showBackToTop ? _scrollToTop : null,
+                  tooltip: 'Volver al inicio',
+                  elevation: 4,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                  child: const Icon(Icons.keyboard_arrow_up_rounded, size: 24),
+                ),
+              ),
+            ),
+          ),
           body: SafeArea(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
