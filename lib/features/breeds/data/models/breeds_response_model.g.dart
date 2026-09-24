@@ -1,10 +1,4 @@
-// GENERATED CODE - DO NOT MODIFY BY HAND
-
 part of 'breeds_response_model.dart';
-
-// **************************************************************************
-// JsonSerializableGenerator
-// **************************************************************************
 
 _$BreedsResponseModelImpl _$$BreedsResponseModelImplFromJson(
   Map<String, dynamic> json,

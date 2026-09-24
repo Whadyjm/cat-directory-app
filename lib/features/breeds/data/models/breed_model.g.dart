@@ -1,10 +1,4 @@
-// GENERATED CODE - DO NOT MODIFY BY HAND
-
 part of 'breed_model.dart';
-
-// **************************************************************************
-// JsonSerializableGenerator
-// **************************************************************************
 
 _$BreedModelImpl _$$BreedModelImplFromJson(Map<String, dynamic> json) =>
     _$BreedModelImpl(

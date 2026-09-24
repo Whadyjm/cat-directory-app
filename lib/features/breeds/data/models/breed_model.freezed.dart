@@ -1,13 +1,4 @@
-// coverage:ignore-file
-// GENERATED CODE - DO NOT MODIFY BY HAND
-// ignore_for_file: type=lint
-// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
-
 part of 'breed_model.dart';
-
-// **************************************************************************
-// FreezedGenerator
-// **************************************************************************
 
 T _$identity<T>(T value) => value;
 
@@ -19,7 +10,6 @@ BreedModel _$BreedModelFromJson(Map<String, dynamic> json) {
   return _BreedModel.fromJson(json);
 }
 
-/// @nodoc
 mixin _$BreedModel {
   String get breed => throw _privateConstructorUsedError;
   String get country => throw _privateConstructorUsedError;
@@ -27,17 +17,13 @@ mixin _$BreedModel {
   String get coat => throw _privateConstructorUsedError;
   String get pattern => throw _privateConstructorUsedError;
 
-  /// Serializes this BreedModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
 
-  /// Create a copy of BreedModel
-  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   $BreedModelCopyWith<BreedModel> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
-/// @nodoc
 abstract class $BreedModelCopyWith<$Res> {
   factory $BreedModelCopyWith(
     BreedModel value,
@@ -53,18 +39,13 @@ abstract class $BreedModelCopyWith<$Res> {
   });
 }
 
-/// @nodoc
 class _$BreedModelCopyWithImpl<$Res, $Val extends BreedModel>
     implements $BreedModelCopyWith<$Res> {
   _$BreedModelCopyWithImpl(this._value, this._then);
 
-  // ignore: unused_field
   final $Val _value;
-  // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of BreedModel
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -78,23 +59,23 @@ class _$BreedModelCopyWithImpl<$Res, $Val extends BreedModel>
       _value.copyWith(
             breed: null == breed
                 ? _value.breed
-                : breed // ignore: cast_nullable_to_non_nullable
+                : breed
                       as String,
             country: null == country
                 ? _value.country
-                : country // ignore: cast_nullable_to_non_nullable
+                : country
                       as String,
             origin: null == origin
                 ? _value.origin
-                : origin // ignore: cast_nullable_to_non_nullable
+                : origin
                       as String,
             coat: null == coat
                 ? _value.coat
-                : coat // ignore: cast_nullable_to_non_nullable
+                : coat
                       as String,
             pattern: null == pattern
                 ? _value.pattern
-                : pattern // ignore: cast_nullable_to_non_nullable
+                : pattern
                       as String,
           )
           as $Val,
@@ -102,7 +83,6 @@ class _$BreedModelCopyWithImpl<$Res, $Val extends BreedModel>
   }
 }
 
-/// @nodoc
 abstract class _$$BreedModelImplCopyWith<$Res>
     implements $BreedModelCopyWith<$Res> {
   factory _$$BreedModelImplCopyWith(
@@ -120,7 +100,6 @@ abstract class _$$BreedModelImplCopyWith<$Res>
   });
 }
 
-/// @nodoc
 class __$$BreedModelImplCopyWithImpl<$Res>
     extends _$BreedModelCopyWithImpl<$Res, _$BreedModelImpl>
     implements _$$BreedModelImplCopyWith<$Res> {
@@ -129,8 +108,6 @@ class __$$BreedModelImplCopyWithImpl<$Res>
     $Res Function(_$BreedModelImpl) _then,
   ) : super(_value, _then);
 
-  /// Create a copy of BreedModel
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -144,30 +121,29 @@ class __$$BreedModelImplCopyWithImpl<$Res>
       _$BreedModelImpl(
         breed: null == breed
             ? _value.breed
-            : breed // ignore: cast_nullable_to_non_nullable
+            : breed
                   as String,
         country: null == country
             ? _value.country
-            : country // ignore: cast_nullable_to_non_nullable
+            : country
                   as String,
         origin: null == origin
             ? _value.origin
-            : origin // ignore: cast_nullable_to_non_nullable
+            : origin
                   as String,
         coat: null == coat
             ? _value.coat
-            : coat // ignore: cast_nullable_to_non_nullable
+            : coat
                   as String,
         pattern: null == pattern
             ? _value.pattern
-            : pattern // ignore: cast_nullable_to_non_nullable
+            : pattern
                   as String,
       ),
     );
   }
 }
 
-/// @nodoc
 @JsonSerializable()
 class _$BreedModelImpl implements _BreedModel {
   const _$BreedModelImpl({
@@ -214,8 +190,6 @@ class _$BreedModelImpl implements _BreedModel {
   int get hashCode =>
       Object.hash(runtimeType, breed, country, origin, coat, pattern);
 
-  /// Create a copy of BreedModel
-  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
@@ -251,8 +225,6 @@ abstract class _BreedModel implements BreedModel {
   @override
   String get pattern;
 
-  /// Create a copy of BreedModel
-  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$BreedModelImplCopyWith<_$BreedModelImpl> get copyWith =>

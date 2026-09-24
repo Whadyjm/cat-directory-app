@@ -1,13 +1,4 @@
-// coverage:ignore-file
-// GENERATED CODE - DO NOT MODIFY BY HAND
-// ignore_for_file: type=lint
-// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
-
 part of 'breeds_response_model.dart';
-
-// **************************************************************************
-// FreezedGenerator
-// **************************************************************************
 
 T _$identity<T>(T value) => value;
 
@@ -19,7 +10,6 @@ BreedsResponseModel _$BreedsResponseModelFromJson(Map<String, dynamic> json) {
   return _BreedsResponseModel.fromJson(json);
 }
 
-/// @nodoc
 mixin _$BreedsResponseModel {
   @JsonKey(name: 'current_page')
   int get currentPage => throw _privateConstructorUsedError;
@@ -28,17 +18,13 @@ mixin _$BreedsResponseModel {
   int get lastPage => throw _privateConstructorUsedError;
   int get total => throw _privateConstructorUsedError;
 
-  /// Serializes this BreedsResponseModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
 
-  /// Create a copy of BreedsResponseModel
-  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   $BreedsResponseModelCopyWith<BreedsResponseModel> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
-/// @nodoc
 abstract class $BreedsResponseModelCopyWith<$Res> {
   factory $BreedsResponseModelCopyWith(
     BreedsResponseModel value,
@@ -53,18 +39,13 @@ abstract class $BreedsResponseModelCopyWith<$Res> {
   });
 }
 
-/// @nodoc
 class _$BreedsResponseModelCopyWithImpl<$Res, $Val extends BreedsResponseModel>
     implements $BreedsResponseModelCopyWith<$Res> {
   _$BreedsResponseModelCopyWithImpl(this._value, this._then);
 
-  // ignore: unused_field
   final $Val _value;
-  // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of BreedsResponseModel
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -77,19 +58,19 @@ class _$BreedsResponseModelCopyWithImpl<$Res, $Val extends BreedsResponseModel>
       _value.copyWith(
             currentPage: null == currentPage
                 ? _value.currentPage
-                : currentPage // ignore: cast_nullable_to_non_nullable
+                : currentPage
                       as int,
             data: null == data
                 ? _value.data
-                : data // ignore: cast_nullable_to_non_nullable
+                : data
                       as List<BreedModel>,
             lastPage: null == lastPage
                 ? _value.lastPage
-                : lastPage // ignore: cast_nullable_to_non_nullable
+                : lastPage
                       as int,
             total: null == total
                 ? _value.total
-                : total // ignore: cast_nullable_to_non_nullable
+                : total
                       as int,
           )
           as $Val,
@@ -97,7 +78,6 @@ class _$BreedsResponseModelCopyWithImpl<$Res, $Val extends BreedsResponseModel>
   }
 }
 
-/// @nodoc
 abstract class _$$BreedsResponseModelImplCopyWith<$Res>
     implements $BreedsResponseModelCopyWith<$Res> {
   factory _$$BreedsResponseModelImplCopyWith(
@@ -114,7 +94,6 @@ abstract class _$$BreedsResponseModelImplCopyWith<$Res>
   });
 }
 
-/// @nodoc
 class __$$BreedsResponseModelImplCopyWithImpl<$Res>
     extends _$BreedsResponseModelCopyWithImpl<$Res, _$BreedsResponseModelImpl>
     implements _$$BreedsResponseModelImplCopyWith<$Res> {
@@ -123,8 +102,6 @@ class __$$BreedsResponseModelImplCopyWithImpl<$Res>
     $Res Function(_$BreedsResponseModelImpl) _then,
   ) : super(_value, _then);
 
-  /// Create a copy of BreedsResponseModel
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -137,26 +114,25 @@ class __$$BreedsResponseModelImplCopyWithImpl<$Res>
       _$BreedsResponseModelImpl(
         currentPage: null == currentPage
             ? _value.currentPage
-            : currentPage // ignore: cast_nullable_to_non_nullable
+            : currentPage
                   as int,
         data: null == data
             ? _value._data
-            : data // ignore: cast_nullable_to_non_nullable
+            : data
                   as List<BreedModel>,
         lastPage: null == lastPage
             ? _value.lastPage
-            : lastPage // ignore: cast_nullable_to_non_nullable
+            : lastPage
                   as int,
         total: null == total
             ? _value.total
-            : total // ignore: cast_nullable_to_non_nullable
+            : total
                   as int,
       ),
     );
   }
 }
 
-/// @nodoc
 @JsonSerializable()
 class _$BreedsResponseModelImpl implements _BreedsResponseModel {
   const _$BreedsResponseModelImpl({
@@ -176,7 +152,6 @@ class _$BreedsResponseModelImpl implements _BreedsResponseModel {
   @override
   List<BreedModel> get data {
     if (_data is EqualUnmodifiableListView) return _data;
-    // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_data);
   }
 
@@ -214,8 +189,6 @@ class _$BreedsResponseModelImpl implements _BreedsResponseModel {
     total,
   );
 
-  /// Create a copy of BreedsResponseModel
-  /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
@@ -253,8 +226,6 @@ abstract class _BreedsResponseModel implements BreedsResponseModel {
   @override
   int get total;
 
-  /// Create a copy of BreedsResponseModel
-  /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$BreedsResponseModelImplCopyWith<_$BreedsResponseModelImpl> get copyWith =>
