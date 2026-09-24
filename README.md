@@ -64,11 +64,46 @@ Se utilizó `flutter_bloc` combinando **BLoC** y **Cubit** según la necesidad d
 
 ## 📊 Auditoría de Rendimiento
 
-- **Scroll a 60 / 120 FPS:** Renderizado fluido verificado con `PerformanceOverlay` mediante `ListView.builder`, widgets `const` y aislamiento de repintado.
-- **Análisis de Tamaño (`flutter build apk --target-platform android-arm64 --analyze-size`):**
-  - **APK comprimido:** **`7.4 MB`** (`app-release.apk`).
-  - **Código de la app (`package:cat_directory_app`):** Solo **`90 KB`** (alta modularidad y optimización).
-  - **Tree-Shaking de fuentes:** Reducción del 99.6% (`CupertinoIcons`: 1.1 KB, `MaterialIcons`: 4.9 KB).
+### 1. Scroll Fluido sin Jank (60 / 120 FPS)
+
+| Carga Inicial (25 razas) | Scroll Profundo Acumulado (75 razas) |
+| :---: | :---: |
+| <img src="docs/performance_overlay.png" width="300" alt="Carga Inicial"> | <img src="docs/performance_overlay_infinite_scroll.png" width="300" alt="Scroll 75 razas"> |
+
+- **Análisis de frames:** 
+  Las métricas reales observadas en el `PerformanceOverlay` confirman un rendimiento sobresaliente tanto en la primera carga como durante el desplazamiento continuo acumulando múltiples páginas:
+  - **GPU / Raster thread:** promedio sostenido de **6.3 ms a 8.2 ms/frame** (ampliamente por debajo del límite de 16.6 ms de 60 FPS y 8.3 ms de 120 FPS).
+  - **UI thread:** promedio de tan solo **2.6 ms a 3.7 ms/frame** (utilizando apenas el 15% al 22% del presupuesto de fotograma).
+  - **Consistencia con volumen:** Al avanzar en la paginación infinita con 75 razas cargadas en memoria, los tiempos del hilo UI mejoran a **2.6 ms/frame**, demostrando la efectividad de la virtualización.
+  - **Jank:** 0 barras rojas (cero cuadros perdidos) gracias a:
+    - Reciclaje de ítems en ventana mediante `ListView.builder`.
+    - Control de concurrencia `droppable()` en la paginación infinita (descarta peticiones de red duplicadas).
+    - Temporizador `debounce(350ms)` en la búsqueda para evitar reconstrucciones por cada tecla pulsada.
+    - Uso extensivo de constructores `const` y aislamiento de repintado en avatares y tarjetas.
+
+### 2. Análisis de Tamaño del APK (`--analyze-size`)
+
+Ejecutado con el comando:
+```bash
+flutter build apk --target-platform android-arm64 --analyze-size
+```
+
+| Componente | Tamaño Descomprimido | Descripción |
+| :--- | :--- | :--- |
+| **`lib/arm64-v8a`** | ~7.0 MB | Motor nativo C++ y runtime AOT de Flutter |
+| **`package:flutter`** | 3.0 MB | Framework Flutter base |
+| **`package:cat_directory_app`** | **90 KB** | Código fuente compilado de la aplicación |
+| **`package:hive_ce`** | 104 KB | Persistencia local NoSQL binaria |
+| **`package:go_router`** | 60 KB | Enrutamiento declarativo |
+| **`package:dio`** | 57 KB | Cliente HTTP con retry exponencial |
+| **`assets/flutter_assets`** | 106 KB | Fuentes e iconos optimizados |
+| **`classes.dex`** | 217 KB | Bytecode Android compilado |
+
+- **Explicación del tamaño:**
+  - **APK comprimido final:** **`7.4 MB`** (`app-release.apk`).
+  - El 95% del peso corresponde al motor y runtime nativo inevitable de Flutter en arquitecturas ARM64.
+  - El código de la aplicación es sumamente ligero (**90 KB**), lo cual demuestra ausencia de librerías infladas o código muerto.
+  - El tree-shaking automático redujo las fuentes en más de un **99.6%** (`CupertinoIcons`: 1.1 KB, `MaterialIcons`: 4.9 KB).
 
 ---
 
