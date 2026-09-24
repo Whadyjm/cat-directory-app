@@ -170,12 +170,15 @@ class BreedDetailPage extends StatelessWidget {
                   color: colorScheme.primary,
                 ),
                 const SizedBox(width: 6),
-                Text(
-                  countryText,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: colorScheme.primary,
+                Flexible(
+                  child: Text(
+                    countryText,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: colorScheme.primary,
+                    ),
                   ),
                 ),
               ],
