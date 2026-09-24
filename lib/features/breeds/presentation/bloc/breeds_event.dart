@@ -18,3 +18,8 @@ final class SearchBreeds extends BreedsEvent {
   const SearchBreeds(this.query);
   final String query;
 }
+
+final class FilterByCoat extends BreedsEvent {
+  const FilterByCoat(this.coat);
+  final String coat;
+}

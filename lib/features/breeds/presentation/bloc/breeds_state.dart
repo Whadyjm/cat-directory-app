@@ -13,6 +13,7 @@ class BreedsState {
     this.isFromCache = false,
     this.failure,
     this.searchQuery = '',
+    this.selectedCoat = 'All',
   });
 
   final List<Breed> allBreeds;
@@ -25,6 +26,7 @@ class BreedsState {
   final bool isFromCache;
   final Failure? failure;
   final String searchQuery;
+  final String selectedCoat;
 
   bool get hasData => allBreeds.isNotEmpty;
   bool get hasError => failure != null && !hasData;
@@ -42,6 +44,7 @@ class BreedsState {
     Failure? failure,
     bool clearFailure = false,
     String? searchQuery,
+    String? selectedCoat,
   }) {
     return BreedsState(
       allBreeds: allBreeds ?? this.allBreeds,
@@ -54,6 +57,7 @@ class BreedsState {
       isFromCache: isFromCache ?? this.isFromCache,
       failure: clearFailure ? null : (failure ?? this.failure),
       searchQuery: searchQuery ?? this.searchQuery,
+      selectedCoat: selectedCoat ?? this.selectedCoat,
     );
   }
 }

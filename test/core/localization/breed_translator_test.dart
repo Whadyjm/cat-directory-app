@@ -22,6 +22,14 @@ void main() {
     expect(BreedTranslator.translateCountry('Egypt', AppLanguage.en), equals('Egypt'));
   });
 
+  test('returns country flag emoji correctly', () {
+    expect(BreedTranslator.getCountryFlag('Egypt'), equals('🇪🇬'));
+    expect(BreedTranslator.getCountryFlag('Egipto'), equals('🇪🇬'));
+    expect(BreedTranslator.getCountryFlag('United States'), equals('🇺🇸'));
+    expect(BreedTranslator.getCountryFlag('developed in the United Kingdom (founding stock from Asia)'), equals('🇬🇧'));
+    expect(BreedTranslator.getCountryFlag('Unknown Territory'), equals('🌍'));
+  });
+
   test('translates all breed attributes when Spanish is selected', () {
     final translated = BreedTranslator.translateBreed(tBreedEn, AppLanguage.es);
 

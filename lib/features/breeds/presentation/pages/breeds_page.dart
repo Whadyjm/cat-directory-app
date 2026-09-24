@@ -150,6 +150,7 @@ class _BreedsPageState extends State<BreedsPage> with WidgetsBindingObserver {
               children: [
                 _buildHeader(context, state, language),
                 _buildSearchBar(context, state, language),
+                _buildFilterChips(context, state, language),
                 Expanded(child: _buildBody(context, state, language)),
               ],
             ),
@@ -288,6 +289,63 @@ class _BreedsPageState extends State<BreedsPage> with WidgetsBindingObserver {
                 : null,
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildFilterChips(
+    BuildContext context,
+    BreedsState state,
+    AppLanguage language,
+  ) {
+    final colorScheme = Theme.of(context).colorScheme;
+    const coats = [
+      'All',
+      'Short',
+      'Long',
+      'Medium',
+      'Hairless',
+      'Rex',
+      'Semi-long',
+    ];
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      child: Row(
+        children: coats.map((coat) {
+          final isSelected = state.selectedCoat.toLowerCase() == coat.toLowerCase();
+          final label = coat == 'All'
+              ? (language.isSpanish ? 'Todos' : 'All')
+              : BreedTranslator.translateCoat(coat, language);
+
+          return Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: ChoiceChip(
+              label: Text(label),
+              selected: isSelected,
+              showCheckmark: false,
+              labelStyle: TextStyle(
+                fontSize: 12,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                color: isSelected ? colorScheme.onPrimary : colorScheme.onSurface,
+              ),
+              selectedColor: colorScheme.primary,
+              backgroundColor: colorScheme.surface,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+                side: BorderSide(
+                  color: isSelected
+                      ? colorScheme.primary
+                      : colorScheme.outlineVariant.withValues(alpha: 0.5),
+                ),
+              ),
+              onSelected: (_) {
+                context.read<BreedsBloc>().add(FilterByCoat(coat));
+              },
+            ),
+          );
+        }).toList(),
       ),
     );
   }

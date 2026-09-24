@@ -31,6 +31,57 @@ abstract final class BreedTranslator {
     'Ethiopia': 'Etiopía',
   };
 
+  static const Map<String, String> _countryFlags = {
+    'Egypt': '🇪🇬',
+    'Egipto': '🇪🇬',
+    'United States': '🇺🇸',
+    'Estados Unidos': '🇺🇸',
+    'United Kingdom': '🇬🇧',
+    'Reino Unido': '🇬🇧',
+    'United Kingdom (England)': '🇬🇧',
+    'Reino Unido (Inglaterra)': '🇬🇧',
+    'United Kingdom (Scotland)': '🏴󠁧󠁢󠁳󠁣󠁴󠁿',
+    'Reino Unido (Escocia)': '🏴󠁧󠁢󠁳󠁣󠁴󠁿',
+    'Canada': '🇨🇦',
+    'Canadá': '🇨🇦',
+    'Russia': '🇷🇺',
+    'Rusia': '🇷🇺',
+    'France': '🇫🇷',
+    'Francia': '🇫🇷',
+    'Japan': '🇯🇵',
+    'Japón': '🇯🇵',
+    'Thailand': '🇹🇭',
+    'Tailandia': '🇹🇭',
+    'Burma': '🇲🇲',
+    'Birmania': '🇲🇲',
+    'China': '🇨🇳',
+    'Australia': '🇦🇺',
+    'Singapore': '🇸🇬',
+    'Singapur': '🇸🇬',
+    'Isle of Man': '🇮🇲',
+    'Isla de Man': '🇮🇲',
+    'Turkey': '🇹🇷',
+    'Turquía': '🇹🇷',
+    'Norway': '🇳🇴',
+    'Noruega': '🇳🇴',
+    'Sweden': '🇸🇪',
+    'Suecia': '🇸🇪',
+    'Germany': '🇩🇪',
+    'Alemania': '🇩🇪',
+    'Italy': '🇮🇹',
+    'Italia': '🇮🇹',
+    'Greece': '🇬🇷',
+    'Grecia': '🇬🇷',
+    'Iran': '🇮🇷',
+    'Irán': '🇮🇷',
+    'Iran (Persia)': '🇮🇷',
+    'Cyprus': '🇨🇾',
+    'Chipre': '🇨🇾',
+    'Somalia': '🇸🇴',
+    'Ethiopia': '🇪🇹',
+    'Etiopía': '🇪🇹',
+  };
+
   static const Map<String, String> _origins = {
     'Natural': 'Natural',
     'Mutation': 'Mutación',
@@ -62,6 +113,19 @@ abstract final class BreedTranslator {
     'Van': 'Van',
     'All': 'Todos los patrones',
   };
+
+  static String getCountryFlag(String country) {
+    final trimmed = country.trim();
+    if (_countryFlags.containsKey(trimmed)) {
+      return _countryFlags[trimmed]!;
+    }
+    for (final entry in _countryFlags.entries) {
+      if (trimmed.toLowerCase().contains(entry.key.toLowerCase())) {
+        return entry.value;
+      }
+    }
+    return '🌍';
+  }
 
   static String translateCountry(String country, AppLanguage language) {
     if (language.isEnglish) return country;

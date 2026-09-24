@@ -20,6 +20,7 @@ class BreedsBloc extends Bloc<BreedsEvent, BreedsState> {
       _onSearchBreeds,
       transformer: _debounce(const Duration(milliseconds: 350)),
     );
+    on<FilterByCoat>(_onFilterByCoat);
   }
 
   final GetBreedsUsecase usecase;
@@ -34,7 +35,7 @@ class BreedsBloc extends Bloc<BreedsEvent, BreedsState> {
     if (cached != null) {
       emit(state.copyWith(
         allBreeds: cached.breeds,
-        filteredBreeds: cached.breeds,
+        filteredBreeds: _filterBreeds(cached.breeds, state.searchQuery, state.selectedCoat),
         currentPage: cached.currentPage,
         hasNextPage: cached.hasNextPage,
         isLoadingInitial: false,
@@ -46,7 +47,7 @@ class BreedsBloc extends Bloc<BreedsEvent, BreedsState> {
       final result = await usecase.call(page: 1);
       emit(state.copyWith(
         allBreeds: result.breeds,
-        filteredBreeds: _applySearch(result.breeds, state.searchQuery),
+        filteredBreeds: _filterBreeds(result.breeds, state.searchQuery, state.selectedCoat),
         currentPage: result.currentPage,
         hasNextPage: result.hasNextPage,
         isLoadingInitial: false,
@@ -80,7 +81,7 @@ class BreedsBloc extends Bloc<BreedsEvent, BreedsState> {
       final merged = [...state.allBreeds, ...result.breeds];
       emit(state.copyWith(
         allBreeds: merged,
-        filteredBreeds: _applySearch(merged, state.searchQuery),
+        filteredBreeds: _filterBreeds(merged, state.searchQuery, state.selectedCoat),
         currentPage: result.currentPage,
         hasNextPage: result.hasNextPage,
         isLoadingMore: false,
@@ -104,6 +105,7 @@ class BreedsBloc extends Bloc<BreedsEvent, BreedsState> {
       isRefreshing: true,
       clearFailure: true,
       searchQuery: '',
+      selectedCoat: 'All',
     ));
 
     try {
@@ -117,6 +119,7 @@ class BreedsBloc extends Bloc<BreedsEvent, BreedsState> {
         isFromCache: false,
         clearFailure: true,
         searchQuery: '',
+        selectedCoat: 'All',
       ));
     } on Failure catch (e) {
       emit(state.copyWith(isRefreshing: false, failure: e));
@@ -135,14 +138,25 @@ class BreedsBloc extends Bloc<BreedsEvent, BreedsState> {
     final query = event.query.trim().toLowerCase();
     emit(state.copyWith(
       searchQuery: query,
-      filteredBreeds: _applySearch(state.allBreeds, query),
+      filteredBreeds: _filterBreeds(state.allBreeds, query, state.selectedCoat),
     ));
   }
 
-  List<Breed> _applySearch(List<Breed> breeds, String query) {
-    if (query.isEmpty) return breeds;
-    return breeds
-        .where((b) => b.breed.toLowerCase().contains(query))
-        .toList();
+  void _onFilterByCoat(
+    FilterByCoat event,
+    Emitter<BreedsState> emit,
+  ) {
+    emit(state.copyWith(
+      selectedCoat: event.coat,
+      filteredBreeds: _filterBreeds(state.allBreeds, state.searchQuery, event.coat),
+    ));
+  }
+
+  List<Breed> _filterBreeds(List<Breed> breeds, String query, String coat) {
+    return breeds.where((b) {
+      final matchesQuery = query.isEmpty || b.breed.toLowerCase().contains(query);
+      final matchesCoat = coat == 'All' || b.coat.toLowerCase().contains(coat.toLowerCase());
+      return matchesQuery && matchesCoat;
+    }).toList();
   }
 }

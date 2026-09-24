@@ -164,10 +164,9 @@ class BreedDetailPage extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
-                  Icons.location_on_outlined,
-                  size: 16,
-                  color: colorScheme.primary,
+                Text(
+                  BreedTranslator.getCountryFlag(breed.country),
+                  style: const TextStyle(fontSize: 14),
                 ),
                 const SizedBox(width: 6),
                 Flexible(

@@ -32,6 +32,14 @@ void main() {
     pattern: 'Spotted',
   );
 
+  const tBreed3 = Breed(
+    breed: 'Persian',
+    country: 'Iran',
+    origin: 'Natural',
+    coat: 'Long',
+    pattern: 'Solid',
+  );
+
   const tPage1Result = BreedsPageResult(
     breeds: [tBreed1],
     currentPage: 1,
@@ -61,6 +69,7 @@ void main() {
     expect(bloc.state.isLoadingInitial, isFalse);
     expect(bloc.state.currentPage, equals(0));
     expect(bloc.state.hasNextPage, isTrue);
+    expect(bloc.state.selectedCoat, equals('All'));
   });
 
   blocTest<BreedsBloc, BreedsState>(
@@ -144,6 +153,24 @@ void main() {
             s.searchQuery == 'beng' &&
             s.filteredBreeds.length == 1 &&
             s.filteredBreeds.first.breed == 'Bengal',
+      ),
+    ],
+  );
+
+  blocTest<BreedsBloc, BreedsState>(
+    'filters breeds list when FilterByCoat is emitted',
+    build: () => bloc,
+    seed: () => const BreedsState(
+      allBreeds: [tBreed1, tBreed2, tBreed3],
+      filteredBreeds: [tBreed1, tBreed2, tBreed3],
+    ),
+    act: (b) => b.add(const FilterByCoat('Long')),
+    expect: () => [
+      predicate<BreedsState>(
+        (s) =>
+            s.selectedCoat == 'Long' &&
+            s.filteredBreeds.length == 1 &&
+            s.filteredBreeds.first.breed == 'Persian',
       ),
     ],
   );

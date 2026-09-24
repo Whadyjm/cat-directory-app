@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/localization/breed_translator.dart';
 import '../../domain/entities/breed.dart';
 
 class BreedListItem extends StatelessWidget {
@@ -15,9 +16,10 @@ class BreedListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final flag = BreedTranslator.getCountryFlag(breed.country);
 
     return Semantics(
-      label: 'Raza: ${breed.breed}, País: ${breed.country}',
+      label: 'Raza: ${breed.breed}, País: ${breed.country}, Pelaje: ${breed.coat}',
       button: true,
       child: GestureDetector(
         onTap: onTap,
@@ -93,14 +95,11 @@ class BreedListItem extends StatelessWidget {
                           const SizedBox(height: 4),
                           Row(
                             children: [
-                              Icon(
-                                Icons.location_on_outlined,
-                                size: 13,
-                                color: colorScheme.onSurface.withValues(
-                                  alpha: 0.5,
-                                ),
+                              Text(
+                                flag,
+                                style: const TextStyle(fontSize: 13),
                               ),
-                              const SizedBox(width: 3),
+                              const SizedBox(width: 4),
                               Expanded(
                                 child: Text(
                                   breed.country,
@@ -115,6 +114,28 @@ class BreedListItem extends StatelessWidget {
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),
+                              if (breed.coat.isNotEmpty) ...[
+                                const SizedBox(width: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 6,
+                                    vertical: 2,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: colorScheme.primary
+                                        .withValues(alpha: 0.08),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Text(
+                                    breed.coat,
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w600,
+                                      color: colorScheme.primary,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ],
                           ),
                         ],
